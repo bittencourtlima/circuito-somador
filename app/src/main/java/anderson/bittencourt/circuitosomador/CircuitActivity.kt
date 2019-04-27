@@ -2,9 +2,12 @@ package anderson.bittencourt.circuitosomador
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_circuit.*
+import kotlinx.android.synthetic.main.activity_circuit.view.*
 
 class CircuitActivity : AppCompatActivity() {
 
@@ -17,13 +20,23 @@ class CircuitActivity : AppCompatActivity() {
     }
 
     private fun setupOnClick() {
-        inputBit1.setOnFocusChangeListener { v, hasFocus ->
-            if(!hasFocus) convertToDecimal(v as EditText, outputBit1)
-        }
 
-        inputBit2.setOnFocusChangeListener { v, hasFocus ->
-            if(!hasFocus) convertToDecimal(v as EditText, outputBit2)
-        }
+        inputBit1.addTextChangedListener( object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                convertToDecimal(inputBit1, outputBit1)
+            }
+        })
+
+
+        inputBit2.addTextChangedListener( object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                convertToDecimal(inputBit2, outputBit2)
+            }
+        } )
 
         convert.setOnClickListener{
             convert()
