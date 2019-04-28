@@ -8,6 +8,11 @@ import android.widget.EditText
 import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_circuit.*
 import kotlinx.android.synthetic.main.activity_circuit.view.*
+import android.app.Activity
+import android.support.v4.content.ContextCompat.getSystemService
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+
 
 class CircuitActivity : AppCompatActivity() {
 
@@ -44,6 +49,7 @@ class CircuitActivity : AppCompatActivity() {
     }
 
     private fun convert() {
+        closeKeyboard()
         val binaryOutput = presenter.sumBits(inputBit1.text.toString(), inputBit2.text.toString())
         outputSomaBinary.text = binaryOutput
         outputSomaDecimal.text = presenter.convertBinaryToDecimal(binaryOutput)
@@ -54,5 +60,10 @@ class CircuitActivity : AppCompatActivity() {
         if(!binary.isEmpty()){
             output.text = presenter.convertBinaryToDecimal(binary)
         }
+    }
+
+    private fun closeKeyboard(){
+        val imm = this.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
     }
 }
