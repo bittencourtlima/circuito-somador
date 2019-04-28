@@ -1,5 +1,6 @@
 package anderson.bittencourt.circuitosomador
 
+import android.util.Log
 import java.lang.StringBuilder
 import kotlin.math.pow
 
@@ -10,10 +11,19 @@ class CircuitPresenter: ContractCircuit.Presenter {
     }
 
     override fun sumBits(input1: String, input2: String): String {
-        val values1 = convertToList(input1)
-        val values2 = convertToList(input2)
+        var values1 = convertToList(input1)
+        var values2 = convertToList(input2)
 
+        values1 = prepareList(values1, values2.size)
+        values2 = prepareList(values2, values1.size)
         return sumBits(values1, values2)
+    }
+
+    private fun prepareList(values: MutableList<Int>, size: Int): MutableList<Int> {
+        while(values.size < size){
+            values.add(0, 0)
+        }
+        return values;
     }
 
     private fun sumBits(values1: List<Int>, values2: List<Int>): String {
@@ -27,14 +37,13 @@ class CircuitPresenter: ContractCircuit.Presenter {
         for(index in values1.size - 1 downTo 0 step 1){
             val value1: Int = values1[index]
             val value2: Int = values2[index]
+            val carryIn = listCarryOut[index + 1]
 
-            var sum = sumBits(value1, value2)
-            sum = sumBits(sum, listCarryOut[index + 1])
-            listResult.add(0,sum)
+            var sumWithoutCarryIn = sumBits(value1, value2)
+            val finalSum = sumBits(sumWithoutCarryIn, carryIn)
+            listResult.add(0,finalSum)
 
-            var carryOut = calculateCarryOut(value1, value2)
-            //carryOut = calculateCarryOut(carryOut, sum)
-
+            var carryOut = calculateCarryOut(value1, value2, sumWithoutCarryIn, carryIn)
             listCarryOut[index] = carryOut
         }
 
@@ -54,7 +63,7 @@ class CircuitPresenter: ContractCircuit.Presenter {
         return convertToDec(values, BASE_BINARIA).toString()
     }
 
-    private fun convertToList(number: String): List<Int> {
+    private fun convertToList(number: String): MutableList<Int> {
         val values = mutableListOf<Int>()
         for(position in number){
             when(position){
@@ -90,15 +99,22 @@ class CircuitPresenter: ContractCircuit.Presenter {
         return if(result) 1 else 0
     }
 
+    private fun OR(bit1: Boolean, bit2: Boolean): Int{
+        val result = bit1 || bit2
+        return if(result) 1 else 0
+    }
+
     private fun sumBits(bit1: Int, bit2: Int): Int{
         val boolean1 = bit1 == 1
         val boolean2 = bit2 == 1
         return XOR(boolean1, boolean2)
     }
 
-    private fun calculateCarryOut(bit1: Int, bit2: Int): Int{
-        val boolean1 = bit1 == 1
-        val boolean2 = bit2 == 1
-        return AND(boolean1, boolean2)
+    private fun calculateCarryOut(bit1: Int, bit2: Int, sum: Int, carryIn: Int): Int{
+        val booleanBit1 = bit1 == 1
+        val booleanBit2 = bit2 == 1
+        val booleanSum = sum == 1
+        val booleanCarryIn = carryIn == 1
+        return OR(AND(booleanBit1, booleanBit2) == 1, AND( booleanCarryIn, booleanSum) == 1)
     }
 }
